@@ -6,10 +6,19 @@ namespace esphome {
 namespace axp192 {
 
 static const char *TAG = "axp192.sensor";
-
 void AXP192Component::setup() 
 {
-  begin(false, false, false, false, false);
+  switch (this->model_) {
+    case AXP192_M5STICKC:
+    {
+        begin(false, false, false, false, false);
+    }
+    case AXP192_M5CORE2:
+    {
+        // disable LDO3 Vibration
+        begin(false, true, false, false, false);
+    }
+  }
 }
 
 void AXP192Component::dump_config() {
@@ -41,8 +50,20 @@ void AXP192Component::update() {
 
 void AXP192Component::begin(bool disableLDO2, bool disableLDO3, bool disableRTC, bool disableDCDC1, bool disableDCDC3)
 {  
-    // Set LDO2 & LDO3(TFT_LED & TFT) 3.0V
-    Write1Byte(0x28, 0xcc);	
+  switch (this->model_) {
+    case AXP192_M5STICKC:
+    {
+        // Set LDO2 & LDO3(TFT_LED & TFT) 3.0V
+        Write1Byte(0x28, 0xcc);	
+    }
+    case AXP192_M5CORE2:
+    {
+        // Set DCDC3 (TFT_LED & TFT) 3.0V
+        Write1Byte(0x27, 0xcc);	
+        // Set LDO2 & LDO3(TFT_LED & TFT) 3.0V
+        Write1Byte(0x28, 0xcc);	
+    }
+  }
 
     // Set ADC sample rate to 200hz
     Write1Byte(0x84, 0b11110010);
@@ -177,8 +198,18 @@ void AXP192Component::UpdateBrightness()
     {
         ubri = c_max;
     }
-    uint8_t buf = Read8bit( 0x28 );
-    Write1Byte( 0x28 , ((buf & 0x0f) | (ubri << 4)) );
+    switch (this->model_) {
+      case AXP192_M5STICKC:
+      {
+        uint8_t buf = Read8bit( 0x28 );
+        Write1Byte( 0x28 , ((buf & 0x0f) | (ubri << 4)) );
+      }
+      case AXP192_M5CORE2:
+      {
+        uint8_t buf = Read8bit( 0x27 );
+        Write1Byte( 0x27 , ((buf & 0x0f) | (ubri << 4)) );
+      }
+    }
 }
 
 bool AXP192Component::GetBatState()

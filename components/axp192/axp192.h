@@ -8,6 +8,11 @@
 namespace esphome {
 namespace axp192 {
 
+enum AXP192Model {
+  AXP192_M5STICKC = 0,
+  AXP192_M5CORE2,
+};
+
 #define SLEEP_MSEC(us) (((uint64_t)us) * 1000L)
 #define SLEEP_SEC(us)  (((uint64_t)us) * 1000000L)
 #define SLEEP_MIN(us)  (((uint64_t)us) * 60L * 1000000L)
@@ -26,6 +31,7 @@ class AXP192Component : public PollingComponent, public i2c::I2CDevice {
 public:
   void set_batterylevel_sensor(sensor::Sensor *batterylevel_sensor) { batterylevel_sensor_ = batterylevel_sensor; }
   void set_brightness(float brightness) { brightness_ = brightness; }
+  void set_model(AXP192Model model) { this->model_ = model; }
 
   // ========== INTERNAL METHODS ==========
   // (In most use cases you won't need these)
@@ -38,14 +44,20 @@ protected:
     sensor::Sensor *batterylevel_sensor_;
     float brightness_{1.0f};
     float curr_brightness_{-1.0f};
+    AXP192Model model_;
 
-    /**
+    /** M5 Stick Values
      * LDO2: Display backlight
      * LDO3: Display Control
-     * RTC: Don't set GPIO1 as LDO
+     * RTC: Don't set GPIO1 as LDO  
      * DCDC1: Main rail. When not set the controller shuts down.
      * DCDC3: Use unknown
-     */
+     ***********************
+     * M5Stack Core2 Values
+     * LDO2: ILI9342C PWR (Display)
+     * LD03: Vibration Motor
+     */ 
+
     void  begin(bool disableLDO2 = false, bool disableLDO3 = false, bool disableRTC = false, bool disableDCDC1 = false, bool disableDCDC3 = false);
     void  UpdateBrightness();
     bool  GetBatState();
