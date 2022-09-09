@@ -1,0 +1,75 @@
+esphome:
+  name: m5stack-core2
+  platform: ESP32
+  board: m5stack-core-esp32
+  
+  # Use this to hardlink the component if it is not discovered
+  # includes:
+  #  - /config/custom_components/axp192/axp192.h
+
+wifi:
+  ssid: "SSID"
+  password: "PASSPHRASE"
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "XXX"
+    password: "XXX"
+
+substitutions:
+  devicename: ${devicename}
+  upper_devicename: ${upper_devicename} 
+
+captive_portal:
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+
+ota:
+
+web_server:
+
+# AXP192 power management - must be present to initialize TFT power on
+sensor:
+  - platform: axp192
+    model: M5CORE2
+    address: 0x34
+    i2c_id: bus_a
+    update_interval: 30s
+    battery_level:
+      name: "${upper_devicename} Battery Level"
+      id: "${devicename}_batterylevel"
+
+  - platform: wifi_signal
+    name: ${upper_devicename} WiFi Signal
+    id: wifi_dbm
+  - platform: uptime
+    name: ${upper_devicename} Uptime
+
+spi:
+  clk_pin: GPIO18
+  mosi_pin: GPIO23
+  miso_pin: GPIO38
+  
+i2c:
+   - id: bus_a
+     sda: GPIO21
+     scl: GPIO22
+     scan: True
+
+font:
+  - file: 'fonts/arial.ttf'
+    id: font1
+    size: 8
+
+# # builtin 80x160 TFT
+display:
+  - platform: ili9341
+    model: M5STACK
+    cs_pin: 5
+    dc_pin: 15
+    lambda: |-
+      it.line(20, 20, 200, 200);
