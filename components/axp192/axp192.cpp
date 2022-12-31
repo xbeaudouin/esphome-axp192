@@ -49,6 +49,15 @@ void AXP192Component::update() {
     }
 
     UpdateBrightness();
+	
+    // If we're waking from a cold boot
+    if (GetStartupReason() == "ESP_RST_POWERON")
+    {
+      	ESP_LOGD(TAG, "First power on, restarting ESP...");
+	    
+	// Reboot the ESP with the axp initialised
+	ESP.restart();
+    }
 }
 
 
@@ -117,16 +126,6 @@ void AXP192Component::begin(bool disableLDO2, bool disableLDO3, bool disableRTC,
     // Enable bat detection
     Write1Byte(0x32, 0x46);
 	
-    ESP_LOGD(TAG, GetStartupReason());
-	
-    // If we're waking from a cold boot, initialise power chip
-    if (GetStartupReason() == "ESP_RST_POWERON")
-    {
-      	ESP_LOGD(TAG, "First power on, restarting ESP...");
-	    
-	// Reboot the ESP with the axp initialised
-	ESP.restart();
-    }
 }
 
 void AXP192Component::Write1Byte( uint8_t Addr ,  uint8_t Data )
