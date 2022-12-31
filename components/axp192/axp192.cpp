@@ -586,7 +586,7 @@ void AXP192Component::SetAdcState(bool state)
     Write1Byte(0x82, state ? 0xff : 0x00);
 }
 
-std::string AXP192InitComponent::GetStartupReason() {
+std::string AXP192Component::GetStartupReason() {
   esp_reset_reason_t reset_reason = ::esp_reset_reason();
   if (reset_reason == ESP_RST_DEEPSLEEP) {
     esp_sleep_source_t wake_reason = esp_sleep_get_wakeup_cause();
