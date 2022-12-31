@@ -204,6 +204,7 @@ void AXP192Component::ReadBuff( uint8_t Addr , uint8_t Size , uint8_t *Buff )
 
 void AXP192Component::UpdateBrightness()
 {
+    ESP_LOGD(TAG, GetStartupReason());
     ESP_LOGD(TAG, "Brightness=%f (Curr: %f)", brightness_, curr_brightness_);
     if (brightness_ == curr_brightness_)
     {
@@ -234,7 +235,7 @@ void AXP192Component::UpdateBrightness()
 }
 
 bool AXP192Component::GetBatState()
-{
+{	
     if( Read8bit(0x01) | 0x20 )
         return true;
     else
