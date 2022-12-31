@@ -229,7 +229,12 @@ void AXP192Component::UpdateBrightness()
       case AXP192_M5CORE2:
       {
         uint8_t buf = Read8bit( 0x27 );
-		Write1Byte( 0x27 , ((buf & 0x80) | (ubri << 3)) );
+	Write1Byte( 0x27 , ((buf & 0x80) | (ubri << 3)) );
+      }
+      case AXP192_M5TOUGH:
+      {
+        uint8_t buf = Read8bit( 0x27 );
+	Write1Byte( 0x27 , ((buf & 0x80) | (ubri << 3)) );
       }
     }
 }
@@ -563,7 +568,6 @@ void AXP192Component::SetLDO3(bool State)
     Write1Byte( 0x12 , buf );
 }
 
-
 void AXP192Component::SetChargeCurrent(uint8_t current)
 {
     uint8_t buf = Read8bit(0x33);
@@ -603,6 +607,7 @@ std::string AXP192InitComponent::GetStartupReason() {
       return "ESP_SLEEP_WAKEUP_UART";
     return std::string{"WAKEUP_UNKNOWN_REASON"};
   }
+	
   if (reset_reason == ESP_RST_UNKNOWN)
     return "ESP_RST_UNKNOWN";
   if (reset_reason == ESP_RST_POWERON)
