@@ -116,6 +116,13 @@ void AXP192Component::begin(bool disableLDO2, bool disableLDO3, bool disableRTC,
     
     // Enable bat detection
     Write1Byte(0x32, 0x46);
+	
+    // If we're waking from a cold boot, initialise power chip
+    if (GetStartupReason() == "ESP_RST_POWERON")
+    {
+	// Reboot the ESP with the axp initialised
+	ESP.restart();
+    }
 }
 
 void AXP192Component::Write1Byte( uint8_t Addr ,  uint8_t Data )
@@ -569,6 +576,50 @@ void AXP192Component::SetAdcState(bool state)
 {
     Write1Byte(0x82, state ? 0xff : 0x00);
 }
+
+std::string AXP192InitComponent::GetStartupReason() {
+  esp_reset_reason_t reset_reason = ::esp_reset_reason();
+  if (reset_reason == ESP_RST_DEEPSLEEP) {
+    esp_sleep_source_t wake_reason = esp_sleep_get_wakeup_cause();
+    if (wake_reason == ESP_SLEEP_WAKEUP_EXT0)
+      return "ESP_SLEEP_WAKEUP_EXT0";
+    if (wake_reason == ESP_SLEEP_WAKEUP_EXT0)
+      return "ESP_SLEEP_WAKEUP_EXT0";
+    if (wake_reason == ESP_SLEEP_WAKEUP_EXT1)
+      return "ESP_SLEEP_WAKEUP_EXT1";
+    if (wake_reason == ESP_SLEEP_WAKEUP_TIMER)
+      return "ESP_SLEEP_WAKEUP_TIMER";
+    if (wake_reason == ESP_SLEEP_WAKEUP_TOUCHPAD)
+      return "ESP_SLEEP_WAKEUP_TOUCHPAD";
+    if (wake_reason == ESP_SLEEP_WAKEUP_ULP)
+      return "ESP_SLEEP_WAKEUP_ULP";
+    if (wake_reason == ESP_SLEEP_WAKEUP_GPIO)
+      return "ESP_SLEEP_WAKEUP_GPIO";
+    if (wake_reason == ESP_SLEEP_WAKEUP_UART)
+      return "ESP_SLEEP_WAKEUP_UART";
+    return std::string{"WAKEUP_UNKNOWN_REASON"};
+  }
+  if (reset_reason == ESP_RST_UNKNOWN)
+    return "ESP_RST_UNKNOWN";
+  if (reset_reason == ESP_RST_POWERON)
+    return "ESP_RST_POWERON";
+  if (reset_reason == ESP_RST_SW)
+    return "ESP_RST_SW";
+  if (reset_reason == ESP_RST_PANIC)
+    return "ESP_RST_PANIC";
+  if (reset_reason == ESP_RST_INT_WDT)
+    return "ESP_RST_INT_WDT";
+  if (reset_reason == ESP_RST_TASK_WDT)
+    return "ESP_RST_TASK_WDT";
+  if (reset_reason == ESP_RST_WDT)
+    return "ESP_RST_WDT";
+  if (reset_reason == ESP_RST_BROWNOUT)
+    return "ESP_RST_BROWNOUT";
+  if (reset_reason == ESP_RST_SDIO)
+    return "ESP_RST_SDIO";
+  return std::string{"RESET_UNKNOWN_REASON"};
+}
+	
 }
 }
 
