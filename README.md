@@ -39,3 +39,18 @@ sensor:
       name: "${upper_devicename} Battery Level"
       id: "${devicename}_batterylevel"
 ```
+
+
+### M5Tough
+
+```yaml
+sensor:
+  - platform: axp192
+    model: M5Tough
+    address: 0x34
+    i2c_id: bus_a
+    update_interval: 30s
+    battery_level:
+      name: "${upper_devicename} Battery Level"
+      id: "${devicename}_batterylevel"
+```
