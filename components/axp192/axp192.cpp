@@ -205,11 +205,12 @@ void AXP192Component::ReadBuff( uint8_t Addr , uint8_t Size , uint8_t *Buff )
 
 void AXP192Component::UpdateBrightness()
 {
-    ESP_LOGD(TAG, "Brightness=%f (Curr: %f)", brightness_, curr_brightness_);
     if (brightness_ == curr_brightness_)
     {
         return;
     }
+
+    ESP_LOGD(TAG, "Brightness=%f (Curr: %f)", brightness_, curr_brightness_);
     curr_brightness_ = brightness_;
 
     const uint8_t c_min = 7;
