@@ -85,6 +85,10 @@ display:
 
 This library is built on prior work published by @M5Stack as well as individual contributors like @airy10, @apolselli, @abmantis, @geiseri, @martydingo, @gonzalop, @shish, @cmet7, @JensGuckenbiehl, @leoedin, @rolloo, @paulchilton amongst others.
 
+## License
+
+The original work by @M5STack that most or all of this is based on was originally licensed under MIT License. However, the various Github projects failed to specify the proper license and given this is currently an active fork of several of these repos, the license cannot be set at the repo level. Anyone leveraging this work should consider this to be derived work from the original MIT licensed code.
+
 ## TODO
 
 - Additional contributions from @JensGuckenbiehl and @rolloo to review and merge into this code base
