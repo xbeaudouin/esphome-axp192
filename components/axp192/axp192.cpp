@@ -46,14 +46,14 @@ float AXP192Component::get_setup_priority() const { return setup_priority::DATA;
 void AXP192Component::update() {
 
     if (this->batterylevel_sensor_ != nullptr) {
-      // To be fixed
-      // This is not giving the right value - mostly there to have some sample sensor...
       float vbat = GetBatVoltage();
-      float batterylevel = 100.0 * ((vbat - 3.0) / (4.1 - 3.0));
+      float batterylevel = 100.0 * ((vbat - 3.0) / (4.2 - 3.0));
 
       ESP_LOGD(TAG, "Got Battery Level=%f (%f)", batterylevel, vbat);
-      if (batterylevel > 100.) {
-        batterylevel = 100;
+      if (batterylevel > 100.0) {
+        batterylevel = 100.0;
+      } else if (batterylevel < 0.0){
+        batterylevel = 0.0;
       }
       this->batterylevel_sensor_->publish_state(batterylevel);
     }
