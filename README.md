@@ -81,10 +81,10 @@ display:
       it.print(160, 0, id(title_font), id(color_white), TextAlign::TOP_CENTER, "Hello World");
 ```
 
-# Credits and Disclaimers
+## Credits and Disclaimers
 
 This library is built on prior work published by @M5Stack as well as individual contributors like @airy10, @apolselli, @abmantis, @geiseri, @martydingo, @gonzalop, @shish, @cmet7, @JensGuckenbiehl, @leoedin, @rolloo, @paulchilton amongst others.
 
-# TODO
+## TODO
 
 - Additional contributions from @JensGuckenbiehl and @rolloo to review and merge into this code base
