@@ -34,6 +34,8 @@ public:
   void set_brightness(float brightness) { brightness_ = brightness; }
   void set_model(AXP192Model model) { this->model_ = model; }
 
+  void perform() { UpdateBrightness(); }
+
   // ========== INTERNAL METHODS ==========
   // (In most use cases you won't need these)
   void setup() override;
