@@ -59,16 +59,31 @@ binary_sensor:
       then:
         - light.turn_off: led1
 
+# Setup external axp192 component
+external_components:
+  - source: github://pionizer/pionizer-axp192
+    components: [axp192]
+
+spi:
+  clk_pin: GPIO13
+  mosi_pin: GPIO15
+
+i2c:
+  - id: i2c_bus
+    sda: GPIO21
+    scl: GPIO22
+    scan: True     
+
 # AXP192 power management - must be present to initialize TFT power on
 sensor:
   - platform: axp192
     model: M5STICKC
     address: 0x34
-    i2c_id: bus_a
-    update_interval: 30s
+    i2c_id: i2c_bus
+    update_interval: 60s
     battery_level:
-      name: "M5Stick Battery Level"
-      id: "m5stick_batterylevel"
+      name: ${upper_devicename} Battery Level
+      id: batterylevel
 
   - platform: wifi_signal
     name: ${upper_devicename} WiFi Signal

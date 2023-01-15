@@ -32,23 +32,10 @@ ota:
 
 web_server:
 
-# AXP192 power management - must be present to initialize TFT power on
-sensor:
-  - platform: axp192
-    model: M5CORE2
-    address: 0x34
-    i2c_id: bus_a
-    update_interval: 30s
-	brightness: 75%
-    battery_level:
-      name: "${upper_devicename} Battery Level"
-      id: "${devicename}_batterylevel"
-
-  - platform: wifi_signal
-    name: ${upper_devicename} WiFi Signal
-    id: wifi_dbm
-  - platform: uptime
-    name: ${upper_devicename} Uptime
+# Setup external axp192 component
+external_components:
+  - source: github://pionizer/pionizer-axp192
+    components: [axp192]
 
 spi:
   clk_pin: GPIO18
@@ -56,10 +43,28 @@ spi:
   miso_pin: GPIO38
   
 i2c:
-   - id: bus_a
-     sda: GPIO21
-     scl: GPIO22
-     scan: True
+    - id: i2c_bus
+      sda: GPIO21
+      scl: GPIO22
+      scan: True
+    
+# AXP192 power management - must be present to initialize TFT power on
+sensor:
+  - platform: axp192
+    model: M5CORE2
+    address: 0x34
+    i2c_id: i2c_bus
+    update_interval: 60s
+	  brightness: 75%
+    battery_level:
+      name: ${upper_devicename} Battery Level
+      id: batterylevel
+
+  - platform: wifi_signal
+    name: ${upper_devicename} WiFi Signal
+    id: wifi_dbm
+  - platform: uptime
+    name: ${upper_devicename} Uptime
 
 font:
   - file: 'fonts/arial.ttf'

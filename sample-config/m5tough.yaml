@@ -14,7 +14,7 @@ api:
 
 # Enable over the air programming
 ota:
-  
+
 # Enable WiFi connection
 wifi:
   ssid: !secret wifi_ssid
@@ -22,7 +22,7 @@ wifi:
 
 # Include the required components for this device
 external_components:
-  - source: github://paulchilton/esphome-axp192
+  - source: github://pionizer/pionizer-axp192
     components: [axp192]
 
 # SPI bus
@@ -43,7 +43,7 @@ sensor:
     model: M5TOUGH
     address: 0x34
     i2c_id: bus_a
-    update_interval: 3s
+    update_interval: 5s
     brightness: 75%
 
   - platform: uptime
@@ -79,13 +79,13 @@ binary_sensor:
 
     on_press:
       then:
-      - logger.log: "Screen was pressed"
+        - logger.log: "Screen was pressed"
 
-      # Also, send an event to home assistant api to indicate someone has pressed the screen. 
-      - homeassistant.event:
-          event: esphome.screen_pressed
-          data:
-            message: Toughscreen was pressed
+        # Also, send an event to home assistant api to indicate someone has pressed the screen.
+        - homeassistant.event:
+            event: esphome.screen_pressed
+            data:
+              message: Toughscreen was pressed
 
 # Fonts used on the display
 font:
@@ -128,8 +128,8 @@ display:
       // Header
       it.print(160, 0, id(title_font), id(color_white), TextAlign::TOP_CENTER, "Hello World");
       it.line(0, 50, it.get_width(), 50, id(color_grey));
-      
-      
+
+
       // Footer
       it.line(0, 215, it.get_width(), 215, id(color_grey));
       if(isnan(id(wifi_strength).state) == 0){
