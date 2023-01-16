@@ -252,48 +252,48 @@ uint8_t AXP192Component::GetBatData()
 {
     return Read8bit(0x75);
 }
+
 //---------coulombcounter_from_here---------
-//enable: void EnableCoulombcounter(void); 
-//disable: void DisableCOulombcounter(void);
-//stop: void StopCoulombcounter(void);
-//clear: void ClearCoulombcounter(void);
-//get charge data: uint32_t GetCoulombchargeData(void);
-//get discharge data: uint32_t GetCoulombdischargeData(void);
+//enable: void EnableCoulombCounter(void); 
+//disable: void DisableCOulombCounter(void);
+//stop: void StopCoulombCounter(void);
+//clear: void ClearCoulombCounter(void);
+//get charge data: uint32_t GetCoulombChargeData(void);
+//get discharge data: uint32_t GetCoulombDischargeData(void);
 //get coulomb val affter calculation: float GetCoulombData(void);
 //------------------------------------------
-void  AXP192Component::EnableCoulombcounter(void)
+void  AXP192Component::EnableCoulombCounter(void)
 {
     Write1Byte( 0xB8 , 0x80 );
 }
 
-void  AXP192Component::DisableCoulombcounter(void)
+void  AXP192Component::DisableCoulombCounter(void)
 {
     Write1Byte( 0xB8 , 0x00 );
 }
 
-void  AXP192Component::StopCoulombcounter(void)
+void  AXP192Component::StopCoulombCounter(void)
 {
     Write1Byte( 0xB8 , 0xC0 );
 }
 
-void  AXP192Component::ClearCoulombcounter(void)
+void  AXP192Component::ClearCoulombCounter(void)
 {
     Write1Byte( 0xB8 , 0xA0 );
 }
 
-uint32_t AXP192Component::GetCoulombchargeData(void)
+uint32_t AXP192Component::GetCoulombChargeData(void)
 {
     return Read32bit(0xB0);
 }
 
-uint32_t AXP192Component::GetCoulombdischargeData(void)
+uint32_t AXP192Component::GetCoulombDischargeData(void)
 {
     return Read32bit(0xB4);
 }
 
 float AXP192Component::GetCoulombData(void)
 {
-
   uint32_t coin = 0;
   uint32_t coout = 0;
 
@@ -304,7 +304,6 @@ float AXP192Component::GetCoulombData(void)
   //Adc rate can be read from 84H ,change this variable if you change the ADC reate
   float ccc = 65536 * 0.5 * (coin - coout) / 3600.0 / 25.0;
   return ccc;
-
 }
 //----------coulomb_end_at_here----------
 

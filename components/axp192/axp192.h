@@ -30,10 +30,9 @@ enum AXP192Model {
 
 class AXP192Component : public PollingComponent, public i2c::I2CDevice {
 public:
+  void set_model(AXP192Model model) { this->model_ = model; }
   void set_batterylevel_sensor(sensor::Sensor *batterylevel_sensor) { batterylevel_sensor_ = batterylevel_sensor; }
   void set_brightness(float brightness) { brightness_ = brightness; }
-  void set_model(AXP192Model model) { this->model_ = model; }
-
   void perform() { UpdateBrightness(); }
 
   // ========== INTERNAL METHODS ==========
@@ -69,13 +68,15 @@ protected:
     bool  GetBatState();
     uint8_t  GetBatData();
   
-    void  EnableCoulombcounter(void);
-    void  DisableCoulombcounter(void);
-    void  StopCoulombcounter(void);
-    void  ClearCoulombcounter(void);
-    uint32_t GetCoulombchargeData(void);
-    uint32_t GetCoulombdischargeData(void);
+    // Coulomb calculation functions
+    void  EnableCoulombCounter(void);
+    void  DisableCoulombCounter(void);
+    void  StopCoulombCounter(void);
+    void  ClearCoulombCounter(void);
+    uint32_t GetCoulombChargeData(void);
+    uint32_t GetCoulombDischargeData(void);
     float GetCoulombData(void); 
+    
     
     uint16_t GetVbatData(void) __attribute__((deprecated));
     uint16_t GetIchargeData(void) __attribute__((deprecated));
@@ -89,7 +90,7 @@ protected:
     uint16_t GetVapsData(void) __attribute__((deprecated));
     uint8_t GetBtnPress(void);
 
-      // -- sleep
+    // -- sleep
     void SetSleep(void);
     void DeepSleep(uint64_t time_in_us = 0);
     void LightSleep(uint64_t time_in_us = 0);
