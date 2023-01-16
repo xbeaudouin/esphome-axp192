@@ -230,12 +230,12 @@ void AXP192Component::UpdateBrightness()
       case AXP192_M5CORE2:
       {
         uint8_t buf = Read8bit( 0x27 );
-	Write1Byte( 0x27 , ((buf & 0x80) | (ubri << 3)) );
+	    Write1Byte( 0x27 , ((buf & 0x80) | (ubri << 3)) );
       }
       case AXP192_M5TOUGH:
       {
         uint8_t buf = Read8bit( 0x27 );
-	Write1Byte( 0x27 , ((buf & 0x80) | (ubri << 3)) );
+	    Write1Byte( 0x27 , ((buf & 0x80) | (ubri << 3)) );
       }
     }
 }
@@ -307,95 +307,6 @@ float AXP192Component::GetCoulombData(void)
 }
 //----------coulomb_end_at_here----------
 
-uint16_t AXP192Component::GetVbatData(void){
-
-    uint16_t vbat = 0;
-    uint8_t buf[2];
-    ReadBuff(0x78,2,buf);
-    vbat = ((buf[0] << 4) + buf[1]); // V
-    return vbat;
-}
-
-uint16_t AXP192Component::GetVinData(void)
-{
-    uint16_t vin = 0;
-    uint8_t buf[2];
-    ReadBuff(0x56,2,buf);
-    vin = ((buf[0] << 4) + buf[1]); // V
-    return vin;
-}
-
-uint16_t AXP192Component::GetIinData(void)
-{
-    uint16_t iin = 0;
-    uint8_t buf[2];
-    ReadBuff(0x58,2,buf);
-    iin = ((buf[0] << 4) + buf[1]);
-    return iin;
-}
-
-uint16_t AXP192Component::GetVusbinData(void)
-{
-    uint16_t vin = 0;
-    uint8_t buf[2];
-    ReadBuff(0x5a,2,buf);
-    vin = ((buf[0] << 4) + buf[1]); // V
-    return vin;
-}
-
-uint16_t AXP192Component::GetIusbinData(void)
-{
-    uint16_t iin = 0;
-    uint8_t buf[2];
-    ReadBuff(0x5C,2,buf);
-    iin = ((buf[0] << 4) + buf[1]);
-    return iin;
-}
-
-uint16_t AXP192Component::GetIchargeData(void)
-{
-    uint16_t icharge = 0;
-    uint8_t buf[2];
-    ReadBuff(0x7A,2,buf);
-    icharge = ( buf[0] << 5 ) + buf[1] ;
-    return icharge;
-}
-
-uint16_t AXP192Component::GetIdischargeData(void)
-{
-    uint16_t idischarge = 0;
-    uint8_t buf[2];
-    ReadBuff(0x7C,2,buf);
-    idischarge = ( buf[0] << 5 ) + buf[1] ;
-    return idischarge;
-}
-
-uint16_t AXP192Component::GetTempData(void)
-{
-    uint16_t temp = 0;
-    uint8_t buf[2];
-    ReadBuff(0x5e,2,buf);
-    temp = ((buf[0] << 4) + buf[1]);
-    return temp;
-}
-
-uint32_t AXP192Component::GetPowerbatData(void)
-{
-    uint32_t power = 0;
-    uint8_t buf[3];
-    ReadBuff(0x70,2,buf);
-    power = (buf[0] << 16) + (buf[1] << 8) + buf[2];
-    return power;
-}
-
-uint16_t AXP192Component::GetVapsData(void)
-{
-    uint16_t vaps = 0;
-    uint8_t buf[2];
-    ReadBuff(0x7e,2,buf);
-    vaps = ((buf[0] << 4) + buf[1]);
-    return vaps;
-}
 
 void AXP192Component::SetSleep(void)
 {
