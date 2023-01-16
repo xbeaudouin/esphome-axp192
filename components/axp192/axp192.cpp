@@ -211,7 +211,6 @@ void AXP192Component::UpdateBrightness()
     }
 
     ESP_LOGD(TAG, "Brightness=%f (Curr: %f)", brightness_, curr_brightness_);
-    curr_brightness_ = brightness_;
 
     const uint8_t c_min = 7;
     const uint8_t c_max = 12;
@@ -226,6 +225,15 @@ void AXP192Component::UpdateBrightness()
       {
         uint8_t buf = Read8bit( 0x28 );
         Write1Byte( 0x28 , ((buf & 0x0f) | (ubri << 4)) );
+
+        if (brightness_ == 0){
+            // Then turn off the backlight power
+            SetLDO2(false);
+        }
+        else if (curr_brightness_ == 0){
+            // We came off zero brightness -> turn backlight back on
+            SetLDO2(true);
+        }
       }
       case AXP192_M5CORE2:
       {
@@ -238,6 +246,8 @@ void AXP192Component::UpdateBrightness()
 	    Write1Byte( 0x27 , ((buf & 0x80) | (ubri << 3)) );
       }
     }
+
+    curr_brightness_ = brightness_;
 }
 
 bool AXP192Component::GetBatState()
