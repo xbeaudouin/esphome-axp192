@@ -12,7 +12,10 @@ void AXP192Component::setup()
     switch (this->model_) {
         case AXP192_M5STICKC:
         {
-            begin(false, false, false, false, false);
+            // boot up with LDO2 disabled (true) to keep display dark
+            // and avoid partially broken screen. Enable display in
+            // ESPHome by setting brightness to more than 0 after boot
+            begin(true, false, false, false, false);
         }
         case AXP192_M5CORE2:
         {
