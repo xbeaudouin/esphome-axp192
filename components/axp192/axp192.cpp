@@ -26,6 +26,9 @@ void AXP192Component::setup()
         {
             begin(false, false, false, false, false);
 
+            // initially turn off backlight power
+            SetLDO3(false);
+
             // If we're waking from a cold boot
             if (GetStartupReason() == "ESP_RST_POWERON")
             {
@@ -242,11 +245,30 @@ void AXP192Component::UpdateBrightness()
       {
         uint8_t buf = Read8bit( 0x27 );
 	    Write1Byte( 0x27 , ((buf & 0x80) | (ubri << 3)) );
+
+        if (brightness_ == 0){
+            // Then turn off the backlight power
+            //SetLDO3(false); -> AXP_DC3
+        }
+        else if (curr_brightness_ == 0){
+            // We came off zero brightness -> turn backlight back on
+            //SetLDO3(true); -> AXP_DC3
+        }
       }
       case AXP192_M5TOUGH:
       {
         uint8_t buf = Read8bit( 0x27 );
 	    Write1Byte( 0x27 , ((buf & 0x80) | (ubri << 3)) );
+
+        if (brightness_ == 0){
+            // Then turn off the backlight power
+            SetLDO3(false);
+        }
+        else if (curr_brightness_ == 0){
+            // We came off zero brightness -> turn backlight back on
+            SetLDO3(true);
+        }
+
       }
     }
 
