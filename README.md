@@ -74,7 +74,7 @@ The display component required for the M5Tough is as follows:
 display:
   - platform: ili9341
     # 320x240
-    model: m5tough
+    model: M5STACK
     cs_pin: GPIO5
     dc_pin: GPIO15
     lambda: |-
