@@ -21,6 +21,10 @@ void AXP192Component::setup()
         {
             // disable LDO3 Vibration
             begin(false, true, false, false, false);
+
+            // disable LDO3 Vibration
+            SetLDO3(false);
+
         }
         case AXP192_M5TOUGH:
         {
@@ -268,7 +272,6 @@ void AXP192Component::UpdateBrightness()
             // We came off zero brightness -> turn backlight back on
             SetLDO3(true);
         }
-
       }
     }
 
