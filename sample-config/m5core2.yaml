@@ -71,9 +71,9 @@ font:
     id: font1
     size: 8
 
-# # builtin 80x160 TFT
 display:
   - platform: ili9341
+    # 320x240
     model: M5STACK
     cs_pin: 5
     dc_pin: 15
