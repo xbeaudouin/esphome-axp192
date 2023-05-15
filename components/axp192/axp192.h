@@ -15,6 +15,7 @@ namespace esphome
             AXP192_M5STICKC = 0,
             AXP192_M5CORE2,
             AXP192_M5TOUGH,
+            AXP192_TTGO_TCALL,
         };
 
 #define SLEEP_MSEC(us) (((uint64_t)us) * 1000L)
@@ -36,6 +37,12 @@ namespace esphome
         public:
             void set_model(AXP192Model model) { this->model_ = model; }
             void set_batterylevel_sensor(sensor::Sensor *batterylevel_sensor) { batterylevel_sensor_ = batterylevel_sensor; }
+            void set_batteryvoltage_sensor(sensor::Sensor *batteryvoltage_sensor) { batteryvoltage_sensor_ = batteryvoltage_sensor; }
+            void set_batterycurrent_sensor(sensor::Sensor *batterycurrent_sensor) { batterycurrent_sensor_ = batterycurrent_sensor; }
+            void set_vbusvoltage_sensor(sensor::Sensor *vbusvoltage_sensor) { vbusvoltage_sensor_ = vbusvoltage_sensor; }
+            void set_vbuscurrent_sensor(sensor::Sensor *vbuscurrent_sensor) { vbuscurrent_sensor_ = vbuscurrent_sensor; }
+            void set_vincurrent_sensor(sensor::Sensor *vincurrent_sensor) { vincurrent_sensor_ = vincurrent_sensor; }
+            void set_temperature_sensor(sensor::Sensor *temperature_sensor) { temperature_sensor_ = temperature_sensor; }
             void set_brightness(float brightness)
             {
                 brightness_ = brightness;
@@ -79,6 +86,12 @@ namespace esphome
 
         protected:
             sensor::Sensor *batterylevel_sensor_;
+            sensor::Sensor *batteryvoltage_sensor_;
+            sensor::Sensor *batterycurrent_sensor_;
+            sensor::Sensor *vbusvoltage_sensor_;
+            sensor::Sensor *vbuscurrent_sensor_;
+            sensor::Sensor *vincurrent_sensor_;
+            sensor::Sensor *temperature_sensor_;
             float brightness_{1.0f};
             float curr_brightness_{-1.0f};
             AXP192Model model_;
@@ -93,6 +106,13 @@ namespace esphome
             // M5Stack Core2 Values
             // LDO2: ILI9342C PWR (Display)
             // LD03: Vibration Motor
+
+            // TTGO T-Call Values
+            // LDO2: NC
+            // LDO3: GPS_VDD
+            // RTC: Don't set GPIO1 as LDO
+            // DCDC1: NC
+            // DCDC3: VDD3V3
 
             void begin(bool disableLDO2 = false, bool disableLDO3 = false, bool disableRTC = false, bool disableDCDC1 = false, bool disableDCDC3 = false);
             void UpdateBrightness();

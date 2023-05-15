@@ -1,0 +1,138 @@
+esphome:
+  name: ttgo-tcall
+
+esp32:
+  board: esp32dev
+  framework:
+    type: esp-idf
+
+# Include the required components for this device
+external_components:
+  - source: github://BalazsGyarmati/esphome-axp192
+    components: [axp192]
+
+# Enable logging
+logger:
+
+# Enable over the air programming
+ota:
+
+# Enable WiFi connection
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_pass
+
+# Enable Home Assistant API
+api:
+  services:
+  - service: send_sms
+    variables:
+      recipient: string
+      message: string
+    then:
+    - logger.log:
+        level: INFO
+        format: "Recipient: %s, message: %s"
+        args: [ 'recipient.c_str()', 'message.c_str()' ]
+    - sim800l.send_sms:
+        recipient: !lambda 'return recipient;'
+        message: !lambda 'return message;'
+
+uart:
+  baud_rate: 9600
+  tx_pin: 27
+  rx_pin: 26
+
+sim800l:
+  on_sms_received:
+    - then:
+      - lambda: |-
+          id(sms_number).publish_state(sender);
+          id(sms_message).publish_state(message);
+    - then:
+      - logger.log:
+          level: INFO
+          format: "INCOMING SMS - Sender: %s, message: %s"
+          args: [ 'id(sms_number).state.c_str()', 'id(sms_message).state.c_str()' ]
+
+i2c:
+  - id: i2c_bus
+    sda: GPIO21
+    scl: GPIO22
+    scan: True
+
+switch:
+  - platform: gpio
+    name: "SIM800_PWKEY"
+    pin: 4
+    restore_mode: ALWAYS_OFF
+  - platform: gpio
+    name: "SIM800_RST"
+    pin: 5
+    restore_mode: ALWAYS_ON
+  - platform: gpio
+    name: "SIM800_POWER"
+    pin: 23
+    restore_mode: ALWAYS_ON
+
+# Define sensors
+binary_sensor:
+  - platform: sim800l
+    registered:
+      name: "Sim800L Registered"
+      id: sim800l_status
+
+sensor:
+  - platform: axp192
+    model: TTGO_TCALL
+    address: 0x34
+    i2c_id: i2c_bus
+    update_interval: 30s
+    battery_level:
+      name: Battery Level
+      id: batterylevel
+    battery_voltage:
+      name: Battery Voltage
+      id: batteryvoltage
+    battery_current:
+      name: Battery Current
+      id: batterycurrent
+    voltage:
+      name: VBUS Voltage
+      id: vbusvoltage
+    current:
+      name: VBUS Current
+      id: vbuscurrent
+    vin_current:
+      name: VIN Current
+      id: vincurrent
+    temperature:
+      name: Temperature
+      id: temperature
+
+  - platform: sim800l
+    rssi:
+      name: "Sim800L RSSI"
+      id: sim800l_rssi
+
+  - platform: uptime
+    name: "Uptime"
+
+  - platform: wifi_signal
+    name: "WiFi Signal"
+    update_interval: 60s
+    id: wifi_strength
+
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      id: ip_address
+
+  - platform: template
+    id: sms_number
+    name: "SMS sender"
+
+  - platform: template
+    id: sms_message
+    name: "SMS message"
+

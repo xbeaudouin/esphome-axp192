@@ -1,7 +1,10 @@
 esphome:
   name: m5stick-c
-  platform: ESP32
+
+esp32:
   board: m5stick-c
+  framework:
+    type: esp-idf
   platformio_options:
     upload_speed: 115200
 
@@ -46,7 +49,7 @@ binary_sensor:
     on_release:
       then:
         - light.turn_off: led1
-        
+
   - platform: gpio
     pin:
       number: GPIO39
@@ -61,7 +64,7 @@ binary_sensor:
 
 # Setup external axp192 component
 external_components:
-  - source: github://pionizer/pionizer-axp192
+  - source: github://BalazsGyarmati/esphome-axp192
     components: [axp192]
 
 spi:
@@ -72,7 +75,7 @@ i2c:
   - id: i2c_bus
     sda: GPIO21
     scl: GPIO22
-    scan: True     
+    scan: True
 
 # AXP192 power management - must be present to initialize TFT power on
 sensor:
@@ -107,7 +110,7 @@ output:
 #############################################
 ### Currently causes an error with compilation
 ##
-# internal IR Transmitter 
+# internal IR Transmitter
 # remote_transmitter:
 #   - pin:
 #       number: GPIO9

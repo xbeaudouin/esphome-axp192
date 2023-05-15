@@ -1,8 +1,11 @@
 esphome:
   name: m5stack-core2
-  platform: ESP32
+
+esp32:
   board: m5stack-core-esp32
-  
+  framework:
+    type: esp-idf
+
   # Use this to hardlink the component if it is not discovered
   # includes:
   #  - /config/custom_components/axp192/axp192.h
@@ -18,7 +21,7 @@ wifi:
 
 substitutions:
   devicename: ${devicename}
-  upper_devicename: ${upper_devicename} 
+  upper_devicename: ${upper_devicename}
 
 captive_portal:
 
@@ -34,20 +37,20 @@ web_server:
 
 # Setup external axp192 component
 external_components:
-  - source: github://pionizer/pionizer-axp192
+  - source: github://BalazsGyarmati/esphome-axp192
     components: [axp192]
 
 spi:
   clk_pin: GPIO18
   mosi_pin: GPIO23
   miso_pin: GPIO38
-  
+
 i2c:
     - id: i2c_bus
       sda: GPIO21
       scl: GPIO22
       scan: True
-    
+
 # AXP192 power management - must be present to initialize TFT power on
 sensor:
   - platform: axp192

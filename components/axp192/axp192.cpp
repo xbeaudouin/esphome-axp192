@@ -1,7 +1,8 @@
 #include "axp192.h"
 #include "esphome/core/log.h"
 #include "esp_sleep.h"
-#include <Esp.h>
+#include "esp_log.h"
+#include "esp_system.h"
 
 namespace esphome
 {
@@ -35,8 +36,14 @@ namespace esphome
                     ESP_LOGD(TAG, "First power on, restarting ESP...");
 
                     // Reboot the ESP with the axp initialised
-                    ESP.restart();
+                    esp_restart();
                 }
+                break;
+            }
+            case AXP192_TTGO_TCALL:
+            {
+                // disable LDO2, LDO3, RTC and DCDC1
+                begin(true, true, true, true, false);
                 break;
             }
             }
@@ -46,7 +53,34 @@ namespace esphome
         {
             ESP_LOGCONFIG(TAG, "AXP192:");
             LOG_I2C_DEVICE(this);
-            LOG_SENSOR("  ", "Battery Level", this->batterylevel_sensor_);
+            if (this->batterylevel_sensor_ != nullptr)
+            {
+                LOG_SENSOR("  ", "Battery Level", this->batterylevel_sensor_);
+            }
+            if (this->batteryvoltage_sensor_ != nullptr)
+            {
+                LOG_SENSOR("  ", "Battery Voltage", this->batteryvoltage_sensor_);
+            }
+            if (this->batterycurrent_sensor_ != nullptr)
+            {
+                LOG_SENSOR("  ", "Battery Current", this->batterycurrent_sensor_);
+            }
+            if (this->vbusvoltage_sensor_ != nullptr)
+            {
+                LOG_SENSOR("  ", "VBUS Voltage", this->vbusvoltage_sensor_);
+            }
+            if (this->vbuscurrent_sensor_ != nullptr)
+            {
+                LOG_SENSOR("  ", "VBUS Current", this->vbuscurrent_sensor_);
+            }
+            if (this->vincurrent_sensor_ != nullptr)
+            {
+                LOG_SENSOR("  ", "VIN Current", this->vincurrent_sensor_);
+            }
+            if (this->temperature_sensor_ != nullptr)
+            {
+                LOG_SENSOR("  ", "Temperature", this->temperature_sensor_);
+            }
         }
 
         float AXP192Component::get_setup_priority() const { return setup_priority::DATA; }
@@ -55,9 +89,10 @@ namespace esphome
         {
             ESP_LOGD(TAG, "update()");
 
+            float vbat = GetBatVoltage();
+
             if (this->batterylevel_sensor_ != nullptr)
             {
-                float vbat = GetBatVoltage();
                 float batterylevel = 100.0 * ((vbat - 3.0) / (4.2 - 3.0));
 
                 ESP_LOGD(TAG, "Got Battery Level=%f (%f)", batterylevel, vbat);
@@ -70,6 +105,53 @@ namespace esphome
                     batterylevel = 0.0;
                 }
                 this->batterylevel_sensor_->publish_state(batterylevel);
+            }
+            if (this->batteryvoltage_sensor_ != nullptr)
+            {
+                ESP_LOGD(TAG, "Got Battery Voltage=%f", vbat);
+                this->batteryvoltage_sensor_->publish_state(vbat);
+            }
+            if (this->batterycurrent_sensor_ != nullptr)
+            {
+                float cbat = GetBatCurrent();
+                if (cbat != 0.0)
+                {
+                    cbat = cbat / 1000;
+                }
+                ESP_LOGD(TAG, "Got Battery Current=%f", cbat);
+                this->batterycurrent_sensor_->publish_state(cbat);
+            }
+            if (this->vbusvoltage_sensor_ != nullptr)
+            {
+                float vbus_v = GetVBusVoltage();
+                ESP_LOGD(TAG, "Got VBUS Voltage=%f", vbus_v);
+                this->vbusvoltage_sensor_->publish_state(vbus_v);
+            }
+            if (this->vbuscurrent_sensor_ != nullptr)
+            {
+                float vbus_c = GetVBusCurrent();
+                if (vbus_c != 0.0)
+                {
+                    vbus_c = vbus_c / 1000;
+                }
+                ESP_LOGD(TAG, "Got VBUS Current=%f", vbus_c);
+                this->vbuscurrent_sensor_->publish_state(vbus_c);
+            }
+            if (this->vincurrent_sensor_ != nullptr)
+            {
+                float vin_c = GetVinCurrent();
+                if (vin_c != 0.0)
+                {
+                    vin_c = vin_c / 1000;
+                }
+                ESP_LOGD(TAG, "Got VIN Current=%f", vin_c);
+                this->vincurrent_sensor_->publish_state(vin_c);
+            }
+            if (this->temperature_sensor_ != nullptr)
+            {
+                float temp = GetTempInAXP192();
+                ESP_LOGD(TAG, "Got Temperature=%f", temp);
+                this->temperature_sensor_->publish_state(temp);
             }
 
             UpdateBrightness();
@@ -101,16 +183,11 @@ namespace esphome
                 Write1Byte(0x28, 0xcc);
                 break;
             }
+            case AXP192_TTGO_TCALL:
+            {
+                break;
             }
-
-            // Set ADC sample rate to 200hz
-            Write1Byte(0x84, 0b11110010);
-
-            // Set ADC to All Enable
-            Write1Byte(0x82, 0xff);
-
-            // Bat charge voltage to 4.2, Current 100MA
-            Write1Byte(0x33, 0xc0);
+            }
 
             // Depending on configuration enable LDO2, LDO3, DCDC1, DCDC3.
             uint8_t buf = (Read8bit(0x12) & 0xef) | 0x4D;
@@ -124,9 +201,6 @@ namespace esphome
                 buf &= ~(1 << 0);
             Write1Byte(0x12, buf);
 
-            // 128ms power on, 4s power off
-            Write1Byte(0x36, 0x0C);
-
             if (!disableRTC)
             {
                 // Set RTC voltage to 3.3V
@@ -136,17 +210,32 @@ namespace esphome
                 Write1Byte(0x90, 0x02);
             }
 
-            // Disable vbus hold limit
-            Write1Byte(0x30, 0x80);
+            // Set ADC sample rate to 200hz
+            Write1Byte(0x84, 0b11110010);
+
+            // Set ADC to All Enable
+            Write1Byte(0x82, 0xff);
 
             // Set temperature protection
             Write1Byte(0x39, 0xfc);
 
-            // Enable RTC BAT charge
-            Write1Byte(0x35, 0xa2 & (disableRTC ? 0x7F : 0xFF));
+            if ( this->model_ != AXP192_TTGO_TCALL)
+            {
+                // Bat charge voltage to 4.2, Current 100MA
+                Write1Byte(0x33, 0xc0);
 
-            // Enable bat detection
-            Write1Byte(0x32, 0x46);
+                // 128ms power on, 4s power off
+                Write1Byte(0x36, 0x0C);
+
+                // Disable vbus hold limit
+                Write1Byte(0x30, 0x80);
+
+                // Enable RTC BAT charge
+                Write1Byte(0x35, 0xa2 & (disableRTC ? 0x7F : 0xFF));
+
+                // Enable bat detection
+                Write1Byte(0x32, 0x46);
+            }
         }
 
         void AXP192Component::Write1Byte(uint8_t Addr, uint8_t Data)
@@ -300,6 +389,10 @@ namespace esphome
                     SetLDO3(true);
                 }
 
+                break;
+            }
+            case AXP192_TTGO_TCALL:
+            {
                 break;
             }
             }

@@ -2,9 +2,12 @@ import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome.components import i2c, sensor
 from esphome.const import CONF_ID,\
-    CONF_BATTERY_LEVEL, CONF_BRIGHTNESS, UNIT_PERCENT, ICON_BATTERY, CONF_MODEL
+    CONF_BATTERY_LEVEL, CONF_BATTERY_VOLTAGE, CONF_VOLTAGE, CONF_CURRENT, CONF_BRIGHTNESS,\
+    CONF_TEMPERATURE, UNIT_PERCENT, UNIT_VOLT, UNIT_AMPERE, UNIT_CELSIUS, ICON_BATTERY, ICON_CURRENT_AC, ICON_THERMOMETER, CONF_MODEL
 
 DEPENDENCIES = ['i2c']
+CONF_BATTERY_CURRENT = "battery_current"
+CONF_VIN_CURRENT = "vin_current"
 
 axp192_ns = cg.esphome_ns.namespace('axp192')
 AXP192Component = axp192_ns.class_('AXP192Component', cg.PollingComponent, i2c.I2CDevice)
@@ -14,6 +17,7 @@ MODELS = {
     "M5CORE2": AXP192Model.AXP192_M5CORE2,
     "M5STICKC": AXP192Model.AXP192_M5STICKC,
     "M5TOUGH": AXP192Model.AXP192_M5TOUGH,
+    "TTGO_TCALL": AXP192Model.AXP192_TTGO_TCALL,
 }
 
 AXP192_MODEL = cv.enum(MODELS, upper=True, space="_")
@@ -26,6 +30,42 @@ CONFIG_SCHEMA = cv.Schema({
             unit_of_measurement=UNIT_PERCENT,
             accuracy_decimals=1,
             icon=ICON_BATTERY,
+        ),
+    cv.Optional(CONF_BATTERY_VOLTAGE):
+        sensor.sensor_schema(
+            unit_of_measurement=UNIT_VOLT,
+            accuracy_decimals=1,
+            icon=ICON_BATTERY,
+        ),
+    cv.Optional(CONF_BATTERY_CURRENT):
+        sensor.sensor_schema(
+            unit_of_measurement=UNIT_AMPERE,
+            accuracy_decimals=1,
+            icon=ICON_BATTERY,
+        ),
+    cv.Optional(CONF_VOLTAGE):
+        sensor.sensor_schema(
+            unit_of_measurement=UNIT_VOLT,
+            accuracy_decimals=1,
+            icon=ICON_CURRENT_AC,
+        ),
+    cv.Optional(CONF_CURRENT):
+        sensor.sensor_schema(
+            unit_of_measurement=UNIT_AMPERE,
+            accuracy_decimals=1,
+            icon=ICON_CURRENT_AC,
+        ),
+    cv.Optional(CONF_VIN_CURRENT):
+        sensor.sensor_schema(
+            unit_of_measurement=UNIT_AMPERE,
+            accuracy_decimals=1,
+            icon=ICON_CURRENT_AC,
+        ),
+    cv.Optional(CONF_TEMPERATURE):
+        sensor.sensor_schema(
+            unit_of_measurement=UNIT_CELSIUS,
+            accuracy_decimals=1,
+            icon=ICON_THERMOMETER,
         ),
     cv.Optional(CONF_BRIGHTNESS, default=1.0): cv.percentage,
 }).extend(cv.polling_component_schema('60s')).extend(i2c.i2c_device_schema(0x77))
@@ -41,6 +81,36 @@ def to_code(config):
         conf = config[CONF_BATTERY_LEVEL]
         sens = yield sensor.new_sensor(conf)
         cg.add(var.set_batterylevel_sensor(sens))
+
+    if CONF_BATTERY_VOLTAGE in config:
+        conf = config[CONF_BATTERY_VOLTAGE]
+        sens = yield sensor.new_sensor(conf)
+        cg.add(var.set_batteryvoltage_sensor(sens))
+
+    if CONF_BATTERY_CURRENT in config:
+        conf = config[CONF_BATTERY_CURRENT]
+        sens = yield sensor.new_sensor(conf)
+        cg.add(var.set_batterycurrent_sensor(sens))
+
+    if CONF_CURRENT in config:
+        conf = config[CONF_CURRENT]
+        sens = yield sensor.new_sensor(conf)
+        cg.add(var.set_vbuscurrent_sensor(sens))
+
+    if CONF_VOLTAGE in config:
+        conf = config[CONF_VOLTAGE]
+        sens = yield sensor.new_sensor(conf)
+        cg.add(var.set_vbusvoltage_sensor(sens))
+
+    if CONF_VIN_CURRENT in config:
+        conf = config[CONF_VIN_CURRENT]
+        sens = yield sensor.new_sensor(conf)
+        cg.add(var.set_vincurrent_sensor(sens))
+
+    if CONF_TEMPERATURE in config:
+        conf = config[CONF_TEMPERATURE]
+        sens = yield sensor.new_sensor(conf)
+        cg.add(var.set_temperature_sensor(sens))
 
     if CONF_BRIGHTNESS in config:
         conf = config[CONF_BRIGHTNESS]
