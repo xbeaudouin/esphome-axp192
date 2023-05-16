@@ -23,19 +23,23 @@ namespace esphome
 #define SLEEP_MIN(us) (((uint64_t)us) * 60L * 1000000L)
 #define SLEEP_HR(us) (((uint64_t)us) * 60L * 60L * 1000000L)
 
-#define CURRENT_100MA (0b0000)
-#define CURRENT_190MA (0b0001)
-#define CURRENT_280MA (0b0010)
-#define CURRENT_360MA (0b0011)
-#define CURRENT_450MA (0b0100)
-#define CURRENT_550MA (0b0101)
-#define CURRENT_630MA (0b0110)
-#define CURRENT_700MA (0b0111)
+        enum AXP192ChargeCurrent : uint8_t
+        {
+            CURRENT_100MA = 0,
+            CURRENT_190MA,
+            CURRENT_280MA,
+            CURRENT_360MA,
+            CURRENT_450MA,
+            CURRENT_550MA,
+            CURRENT_630MA,
+            CURRENT_700MA,
+        };
 
         class AXP192Component : public PollingComponent, public i2c::I2CDevice
         {
         public:
             void set_model(AXP192Model model) { this->model_ = model; }
+            void set_charge_current(AXP192ChargeCurrent charge_current) { this->charge_current_ = charge_current; }
             void set_batterylevel_sensor(sensor::Sensor *batterylevel_sensor) { batterylevel_sensor_ = batterylevel_sensor; }
             void set_batteryvoltage_sensor(sensor::Sensor *batteryvoltage_sensor) { batteryvoltage_sensor_ = batteryvoltage_sensor; }
             void set_batterycurrent_sensor(sensor::Sensor *batterycurrent_sensor) { batterycurrent_sensor_ = batterycurrent_sensor; }
@@ -95,6 +99,7 @@ namespace esphome
             float brightness_{1.0f};
             float curr_brightness_{-1.0f};
             AXP192Model model_;
+            AXP192ChargeCurrent charge_current_;
 
             // M5 Stick Values
             // LDO2: Display backlight

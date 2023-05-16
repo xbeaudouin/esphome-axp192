@@ -12,6 +12,7 @@ namespace esphome
         void AXP192Component::setup()
         {
             ESP_LOGD(TAG, "setup(): Model %d", this->model_);
+            ESP_LOGD(TAG, "setup(): Charge current %d", this->charge_current_);
 
             switch (this->model_)
             {
@@ -236,6 +237,10 @@ namespace esphome
                 // Enable bat detection
                 Write1Byte(0x32, 0x46);
             }
+
+            // Set charge current
+            SetChargeCurrent(this->charge_current_);
+
         }
 
         void AXP192Component::Write1Byte(uint8_t Addr, uint8_t Data)

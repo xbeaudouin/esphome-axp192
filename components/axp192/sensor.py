@@ -3,7 +3,7 @@ import esphome.config_validation as cv
 from esphome.components import i2c, sensor
 from esphome.const import CONF_ID,\
     CONF_BATTERY_LEVEL, CONF_BATTERY_VOLTAGE, CONF_VOLTAGE, CONF_CURRENT, CONF_BRIGHTNESS,\
-    CONF_TEMPERATURE, UNIT_PERCENT, UNIT_VOLT, UNIT_AMPERE, UNIT_CELSIUS, ICON_BATTERY, ICON_CURRENT_AC, ICON_THERMOMETER, CONF_MODEL
+    CONF_TEMPERATURE, UNIT_PERCENT, UNIT_VOLT, UNIT_AMPERE, UNIT_CELSIUS, ICON_BATTERY, ICON_CURRENT_AC, ICON_THERMOMETER, CONF_MODEL, CONF_MAX_CURRENT
 
 DEPENDENCIES = ['i2c']
 CONF_BATTERY_CURRENT = "battery_current"
@@ -12,6 +12,7 @@ CONF_VIN_CURRENT = "vin_current"
 axp192_ns = cg.esphome_ns.namespace('axp192')
 AXP192Component = axp192_ns.class_('AXP192Component', cg.PollingComponent, i2c.I2CDevice)
 AXP192Model = axp192_ns.enum("AXP192Model")
+AXP192ChargeCurrent = axp192_ns.enum("AXP192ChargeCurrent")
 
 MODELS = {
     "M5CORE2": AXP192Model.AXP192_M5CORE2,
@@ -19,12 +20,24 @@ MODELS = {
     "M5TOUGH": AXP192Model.AXP192_M5TOUGH,
     "TTGO_TCALL": AXP192Model.AXP192_TTGO_TCALL,
 }
+CHARGE_CURRENTS = {
+    "100MA": AXP192ChargeCurrent.CURRENT_100MA,
+    "190MA": AXP192ChargeCurrent.CURRENT_190MA,
+    "280MA": AXP192ChargeCurrent.CURRENT_280MA,
+    "360MA": AXP192ChargeCurrent.CURRENT_360MA,
+    "450MA": AXP192ChargeCurrent.CURRENT_450MA,
+    "550MA": AXP192ChargeCurrent.CURRENT_550MA,
+    "630MA": AXP192ChargeCurrent.CURRENT_630MA,
+    "700MA": AXP192ChargeCurrent.CURRENT_700MA,
+}
 
 AXP192_MODEL = cv.enum(MODELS, upper=True, space="_")
+AXP192_CHARGE_CURRENT = cv.enum(CHARGE_CURRENTS, upper=True, space="")
 
 CONFIG_SCHEMA = cv.Schema({
     cv.GenerateID(): cv.declare_id(AXP192Component),
     cv.Required(CONF_MODEL): AXP192_MODEL,
+    cv.Optional(CONF_MAX_CURRENT): AXP192_CHARGE_CURRENT,
     cv.Optional(CONF_BATTERY_LEVEL):
         sensor.sensor_schema(
             unit_of_measurement=UNIT_PERCENT,
@@ -77,6 +90,10 @@ def to_code(config):
     yield i2c.register_i2c_device(var, config)
 
     cg.add(var.set_model(config[CONF_MODEL]))
+
+    if CONF_MAX_CURRENT in config:
+        cg.add(var.set_charge_current(config[CONF_MAX_CURRENT]))
+
     if CONF_BATTERY_LEVEL in config:
         conf = config[CONF_BATTERY_LEVEL]
         sens = yield sensor.new_sensor(conf)
