@@ -47,7 +47,7 @@ namespace esphome
                 begin(true, true, true, true, false);
                 break;
             }
-	    case APX192_LILYGO_TCAMINI:
+	    case AXP192_LILYGO_TCAMINI:
 	    {
                 begin(false, false, false, false, false);
                 break;
