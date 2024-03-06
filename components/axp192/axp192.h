@@ -16,6 +16,7 @@ namespace esphome
             AXP192_M5CORE2,
             AXP192_M5TOUGH,
             AXP192_TTGO_TCALL,
+            AXP192_LILYGO_TCAMINI,
         };
 
 #define SLEEP_MSEC(us) (((uint64_t)us) * 1000L)

@@ -16,7 +16,7 @@ This component adds a new model configuration to the AXP192 sensor which determi
 
 ```yaml
 external_components:
-  - source: github://pionizer/pionizer-axp192
+  - source: github://xbeaudouin/pionizer-axp192
     components: [axp192]
 ```
 
