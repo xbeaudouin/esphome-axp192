@@ -52,6 +52,7 @@ namespace esphome
                 begin(false, false, false, false, false);
                 break;
             }
+	    }
         }
 
         void AXP192Component::dump_config()
